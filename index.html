@@ -4,168 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pastel Daily Diary</title>
-    <!-- Load Tailwind CSS -->
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter/Poppins font -->
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Load Lucide Icons for aesthetic vectors -->
+
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <style>
-        /* Define CSS Variables for Theming */
-        :root {
-            --bg: #F7FBFB;
-            --card: #FFFFFF;
-            --accent: #AEE6E6; /* Soft Mint */
-            --accent-light: #DFF7F7; /* Lighter Mint */
-            --button-bg: #7FC7C7; /* Main Mint */
-            --text: #1A202C;
-            --text-soft: #555555;
-            --shadow: rgba(150,200,200,0.25); /* Soft pastel shadow */
-            --radius-large: 24px;
-            --radius-input: 14px;
-        }
 
-        /* Mint Pastel Theme (Default) */
-        .theme-mint {
-            --bg: #F7FBFB;
-            --card: #FFFFFF;
-            --accent: #AEE6E6;
-            --accent-light: #DFF7F7;
-            --button-bg: #7FC7C7;
-            --shadow: rgba(150,200,200,0.25);
-        }
-
-        /* Pink Pastel Theme */
-        .theme-pink {
-            --bg: #FFF7F9;
-            --card: #FFFFFF;
-            --accent: #FFC0CB; /* Light Pink */
-            --accent-light: #FFE0E6;
-            --button-bg: #F08080; /* Coral */
-            --shadow: rgba(255,192,203,0.3);
-        }
-        
-        /* Lavender Pastel Theme */
-        .theme-lavender {
-            --bg: #FCF7FF;
-            --card: #FFFFFF;
-            --accent: #D8BFD8; /* Plum */
-            --accent-light: #EDE0F7;
-            --button-bg: #B19CD9; /* Medium Lavender */
-            --shadow: rgba(216,191,216,0.3);
-        }
-
-        /* Ocean Blue Soft Theme */
-        .theme-ocean {
-            --bg: #F7FBFF;
-            --card: #FFFFFF;
-            --accent: #ADD8E6; /* Light Blue */
-            --accent-light: #E0F7FF;
-            --button-bg: #87CEEB; /* Sky Blue */
-            --shadow: rgba(173,216,230,0.3);
-        }
-
-        /* Night Pastel (Dark) Theme */
-        .theme-night {
-            --bg: #1A202C;
-            --card: #2D3748;
-            --accent: #4A5568;
-            --accent-light: #718096;
-            --button-bg: #A0AEC0;
-            --text: #E2E8F0;
-            --text-soft: #CBD5E0;
-            --shadow: rgba(0,0,0,0.5);
-        }
-
-        /* Global Styles */
-        body {
-            font-family: 'Poppins', 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            transition: background-color 0.5s, color 0.5s;
-        }
-
-        /* Utility Classes for Variables */
-        .bg-card { background-color: var(--card); }
-        .bg-accent-light { background-color: var(--accent-light); }
-        .bg-button { background-color: var(--button-bg); }
-        .text-accent { color: var(--button-bg); }
-        .text-soft { color: var(--text-soft); }
-
-        .shadow-soft { box-shadow: 0 10px 30px -10px var(--shadow); }
-        .shadow-card { box-shadow: 0 8px 20px -8px var(--shadow); }
-        .rounded-card { border-radius: var(--radius-large); }
-        .rounded-input { border-radius: var(--radius-input); }
-
-        input[type="text"], textarea, select {
-            border-color: var(--accent);
-            background-color: var(--card);
-            color: var(--text);
-            padding: 0.75rem 1rem;
-            border-width: 1px;
-        }
-        
-        .nav-item {
-            transition: background-color 0.2s, color 0.2s;
-            border-radius: 12px;
-        }
-
-        /* Custom Checkbox Style (Pastel) */
-        .pastel-checkbox input:checked + label .checkbox-icon {
-            background-color: var(--button-bg);
-            border-color: var(--button-bg);
-        }
-        .pastel-checkbox input:checked + label .checkbox-icon svg {
-            opacity: 1;
-        }
-        .pastel-checkbox .checkbox-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 8px;
-            border: 2px solid var(--accent);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .pastel-checkbox .checkbox-icon svg {
-            color: white;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        /* Timeline Styles */
-        .timeline-container {
-            position: relative;
-            padding-left: 30px;
-        }
-        .timeline-container::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: var(--accent);
-            border-radius: 2px;
-        }
-        .timeline-item {
-            position: relative;
-            margin-bottom: 40px;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 5px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: var(--button-bg);
-            z-index: 10;
-        }
-    </style>
+    <!-- 🎨 Your CSS file -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="theme-mint min-h-screen pt-20" onresize="resizeChart()">
 
