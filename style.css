@@ -12,7 +12,7 @@
     --radius-input: 14px;
 }
 
-/* Mint Pastel Theme (Default) */
+/* Theme Definitions */
 .theme-mint {
     --bg: #F7FBFB;
     --card: #FFFFFF;
@@ -21,8 +21,6 @@
     --button-bg: #7FC7C7;
     --shadow: rgba(150,200,200,0.25);
 }
-
-/* Pink Pastel Theme */
 .theme-pink {
     --bg: #FFF7F9;
     --card: #FFFFFF;
@@ -31,8 +29,6 @@
     --button-bg: #F08080;
     --shadow: rgba(255,192,203,0.3);
 }
-
-/* Lavender Pastel */
 .theme-lavender {
     --bg: #FCF7FF;
     --card: #FFFFFF;
@@ -41,8 +37,6 @@
     --button-bg: #B19CD9;
     --shadow: rgba(216,191,216,0.3);
 }
-
-/* Ocean Blue Theme */
 .theme-ocean {
     --bg: #F7FBFF;
     --card: #FFFFFF;
@@ -51,8 +45,6 @@
     --button-bg: #87CEEB;
     --shadow: rgba(173,216,230,0.3);
 }
-
-/* Night Theme */
 .theme-night {
     --bg: #1A202C;
     --card: #2D3748;
@@ -64,14 +56,16 @@
     --shadow: rgba(0,0,0,0.5);
 }
 
-/* Global */
+/* Global Styles */
 body {
     font-family: 'Poppins','Inter',sans-serif;
     background-color: var(--bg);
     color: var(--text);
-    transition: background-color 0.5s, color 0.5s;
+    /* Task 3.b: Smooth transition cho nền và chữ khi đổi theme */
+    transition: background-color 0.5s, color 0.5s; 
 }
 
+/* Custom Tailwind Utilities using CSS Variables */
 .bg-card { background-color: var(--card); }
 .bg-accent-light { background-color: var(--accent-light); }
 .bg-button { background-color: var(--button-bg); }
@@ -80,40 +74,228 @@ body {
 
 .shadow-soft { box-shadow: 0 10px 30px -10px var(--shadow); }
 .shadow-card { box-shadow: 0 8px 20px -8px var(--shadow); }
+.shadow-deep { box-shadow: 0 20px 40px -15px var(--shadow); }
+.shadow-image { 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
 
 .rounded-card { border-radius: var(--radius-large); }
 .rounded-input { border-radius: var(--radius-input); }
 
-input[type="text"], textarea, select {
+/* Task 3.b: Thêm Transition cho Input/Textarea */
+input[type="text"], textarea, select, input[type="date"] {
     border-color: var(--accent);
     background-color: var(--card);
     color: var(--text);
     padding: 0.75rem 1rem;
     border-width: 1px;
+    transition: all 0.2s ease-out; /* Transition mượt mà khi focus */
 }
 
+input[type="text"]:focus, 
+textarea:focus, 
+select:focus,
+input[type="date"]:focus {
+    /* Cung cấp visual feedback tốt hơn khi focus */
+    outline: 2px solid var(--button-bg); 
+    border-color: var(--button-bg);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--button-bg) 25%, transparent);
+}
+
+/* Task 3.b: Navigation Item Hover Effect */
 .nav-item {
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s, transform 0.1s, box-shadow 0.2s;
     border-radius: 12px;
 }
+.nav-item:hover {
+    transform: translateY(-2px); /* Nhấc nhẹ lên */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
 
-/* Checkbox */
-.pastel-checkbox input:checked + label .checkbox-icon {
+/* Mood Button Hover Effect */
+.mood-btn {
+    transition: all 0.2s ease-out;
+    cursor: pointer;
+}
+.mood-btn:hover {
+    transform: scale(1.1); /* Phóng to nhẹ khi hover */
+    box-shadow: 0 0 10px var(--accent);
+}
+
+/* Custom Animations */
+
+/* 1. Animation cho Checkbox (Lắc nhẹ khi check) */
+@keyframes bounce-once {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-3px) scale(1.05); /* Lên nhẹ và phóng to icon */
+  }
+  40% {
+    transform: translateY(0);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounce-once 0.4s ease-in-out;
+}
+
+/* 2. Animation cho Modal/Input Section (Fade In/Out) */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px) scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+  to { 
+    opacity: 0; 
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fadeOut {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
+/* 3. Slide In Animation */
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-slideInUp {
+    animation: slideInUp 0.5s ease-out;
+}
+
+/* 4. Floating Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* 5. Shimmer Loading Effect */
+.shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--accent-light) 25%,
+        var(--card) 50%,
+        var(--accent-light) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* 6. Success Pulse Animation */
+@keyframes successPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(126, 217, 87, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(126, 217, 87, 0);
+    }
+}
+
+.success-pulse {
+    animation: successPulse 2s ease-in-out;
+}
+
+/* 7. Ripple Effect for Buttons */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20);
+        opacity: 0;
+    }
+}
+
+/* 8. Spin Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 9. Pulse Animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Checkbox Styling */
+.pastel-checkbox input:checked + .checkbox-icon {
     background-color: var(--button-bg);
     border-color: var(--button-bg);
+    transform: scale(1.05);
 }
-.pastel-checkbox input:checked + label .checkbox-icon svg {
-    opacity: 1;
-}
+
 .pastel-checkbox .checkbox-icon {
     width: 24px;
     height: 24px;
     border-radius: 8px;
     border: 2px solid var(--accent);
+    background-color: var(--accent-light);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
+    cursor: pointer;
 }
 .pastel-checkbox .checkbox-icon svg {
     color: white;
@@ -121,7 +303,11 @@ input[type="text"], textarea, select {
     transition: opacity 0.2s;
 }
 
-/* Timeline */
+.pastel-checkbox input:checked + .checkbox-icon svg {
+    opacity: 1;
+}
+
+/* Timeline Styling */
 .timeline-container {
     position: relative;
     padding-left: 30px;
@@ -135,18 +321,297 @@ input[type="text"], textarea, select {
     width: 4px;
     background-color: var(--accent);
     border-radius: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--button-bg));
 }
 .timeline-item {
     position: relative;
     margin-bottom: 40px;
+    animation: slideInUp 0.5s ease-out;
+    animation-fill-mode: both;
 }
 .timeline-item::before {
     content: '';
     position: absolute;
     left: -33px;
     top: 5px;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background-color: var(--button-bg);
+    transition: background-color 0.5s, transform 0.3s;
+    border: 2px solid var(--card);
+    z-index: 1;
+}
+.timeline-item:hover::before {
+    transform: scale(1.3);
+    box-shadow: 0 0 0 4px var(--accent-light);
+}
+
+/* Task 3.b: Hover Effect cho các thẻ Timeline */
+.timeline-item > div {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.timeline-item > div:hover {
+    transform: translateY(-5px) scale(1.01); /* Nâng thẻ lên và phóng to nhẹ */
+    box-shadow: 0 15px 35px -10px var(--shadow); /* Đổ bóng sâu hơn */
+}
+
+/* Card Glow Effect */
+.card-glow {
+    position: relative;
+}
+
+.card-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(
+        45deg,
+        var(--accent),
+        var(--button-bg),
+        var(--accent)
+    );
+    border-radius: calc(var(--radius-large) + 4px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card-glow:hover::before {
+    opacity: 0.3;
+}
+
+/* Image Hover Effects */
+.image-hover {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    cursor: pointer;
+}
+
+.image-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.1) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.image-hover:hover::before {
+    opacity: 1;
+}
+
+.image-hover img {
+    transition: transform 0.5s ease;
+}
+
+.image-hover:hover img {
+    transform: scale(1.05);
+}
+
+/* Button Pulse Effect */
+.btn-pulse {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-pulse:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 100%;
+    transform: scale(0, 0);
+    animation: ripple 0.6s ease-out;
+}
+
+/* View Transitions */
+.view {
+    animation: slideInUp 0.5s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .timeline-container {
+        padding-left: 20px;
+    }
+    
+    .timeline-item::before {
+        left: -26px;
+        width: 10px;
+        height: 10px;
+    }
+    
+    .mood-btn {
+        padding: 0.5rem;
+        font-size: 2rem;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--accent-light);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--button-bg);
+}
+
+/* Selection Styling */
+::selection {
+    background-color: var(--accent);
+    color: var(--text);
+}
+
+/* Focus Styles for Accessibility */
+:focus-visible {
+    outline: 2px solid var(--button-bg);
+    outline-offset: 2px;
+}
+
+/* Loading State */
+.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Notification Styling */
+.notification {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.notification.success {
+    background-color: #d1fae5;
+    border-color: #34d399;
+    color: #065f46;
+}
+
+.notification.error {
+    background-color: #fee2e2;
+    border-color: #f87171;
+    color: #991b1b;
+}
+
+.notification.warning {
+    background-color: #fef3c7;
+    border-color: #fbbf24;
+    color: #92400e;
+}
+
+.notification.info {
+    background-color: #dbeafe;
+    border-color: #60a5fa;
+    color: #1e40af;
+}
+
+/* Photo Upload Placeholder */
+.photo-upload {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.photo-upload:hover {
+    background-color: var(--accent) !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+.photo-upload:active {
+    transform: scale(0.95);
+}
+
+/* Theme Button Styling */
+.theme-btn {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.theme-btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Export Button Animation */
+@keyframes exportSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.exporting i {
+    animation: exportSpin 1s linear infinite;
+}
+
+/* Empty State Styling */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-soft);
+}
+
+.empty-state i {
+    opacity: 0.2;
+    margin-bottom: 1rem;
+}
+
+/* Print Styles */
+@media print {
+    nav,
+    #theme-panel,
+    #theme-toggle,
+    button {
+        display: none !important;
+    }
+    
+    body {
+        background-color: white !important;
+        color: black !important;
+    }
+    
+    .card-glow::before,
+    .shadow-soft,
+    .shadow-card {
+        box-shadow: none !important;
+    }
 }
