@@ -15,6 +15,7 @@
 </head>
 <body class="theme-mint min-h-screen pt-20" onresize="resizeChart()">
 
+    <!-- Theme Panel -->
     <div id="theme-panel" class="fixed top-20 right-4 z-50 bg-card p-4 rounded-card shadow-soft hidden">
         <h3 class="font-bold mb-3 text-lg">Chọn Chủ Đề</h3>
         <div class="grid grid-cols-2 gap-3">
@@ -26,6 +27,7 @@
         </div>
     </div>
 
+    <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-40 bg-card shadow-soft p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="text-2xl font-bold text-accent">
@@ -56,11 +58,13 @@
         </div>
     </nav>
     
+    <!-- Main Content -->
     <main class="max-w-5xl mx-auto p-4 md:p-8">
         
+        <!-- Header with Streak Counter -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0">
             <div id="streak-counter" class="bg-button text-white px-4 py-2 rounded-[18px] font-semibold text-sm shadow-soft animate-pulse">
-                🔥 7 ngày liên tiếp
+                🔥 0 ngày liên tiếp
             </div>
             <div class="bg-card shadow-soft rounded-[20px] p-4 text-center text-lg font-semibold card-glow" style="background: linear-gradient(135deg, var(--accent-light), #FFE0E6);">
                 <i data-lucide="heart" class="inline w-5 h-5 mr-2"></i>
@@ -68,16 +72,19 @@
             </div>
         </div>
 
+        <!-- Diary Page -->
         <div id="diary-page" class="view">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Note to Self</h1>
             
             <div class="bg-card p-6 md:p-10 rounded-card shadow-soft max-w-4xl mx-auto card-glow">
                 
+                <!-- Date Header -->
                 <h2 class="text-2xl font-bold mb-6 flex items-center">
                     <i data-lucide="calendar" class="w-6 h-6 mr-2"></i>
                     Ngày: <span id="current-date">10/12/2025</span>
                 </h2>
 
+                <!-- Mood Selector -->
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold mb-3 text-soft">Tâm trạng hôm nay:</h3>
                     <div id="mood-selector" class="flex space-x-4">
@@ -89,13 +96,14 @@
                     </div>
                 </div>
 
+                <!-- Achievements & Stress -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
                             <i data-lucide="trophy" class="w-5 h-5 mr-2"></i>
                             Thành tựu hôm nay
                         </h3>
-                        <textarea id="achievements" rows="3" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" placeholder="Gợi ý: Ăn đủ bữa, tập thể dục, skincare…"></textarea>
+                        <textarea id="achievements" rows="3" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" placeholder="  Gợi ý: Ăn đủ bữa, tập thể dục, skincare…"></textarea>
                     </div>
 
                     <div>
@@ -107,6 +115,7 @@
                     </div>
                 </div>
 
+                <!-- Gratitude Section -->
                 <div class="bg-accent-light p-6 rounded-card shadow-card mb-8 card-glow">
                     <h3 class="text-xl font-semibold mb-3 flex items-center">
                         <i data-lucide="heart" class="w-5 h-5 mr-2"></i>
@@ -119,6 +128,7 @@
                     </div>
                 </div>
 
+                <!-- Self-care & Photos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
@@ -184,6 +194,7 @@
                     </div>
                 </div>
 
+                <!-- Diary Content -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-3 flex items-center">
                         <i data-lucide="pen-tool" class="w-5 h-5 mr-2"></i>
@@ -196,6 +207,7 @@
                     </p>
                 </div>
 
+                <!-- Save Button -->
                 <button onclick="saveDailyEntry()" class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse">
                     <span class="flex items-center justify-center space-x-2">
                         <i data-lucide="save" class="w-5 h-5"></i>
@@ -205,21 +217,27 @@
             </div>
         </div>
 
+        <!-- Timeline Page -->
         <div id="timeline-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Dòng Thời Gian Kỷ Niệm</h1>
 
+            <!-- Filters -->
             <div class="bg-card p-4 md:p-6 rounded-card shadow-soft mb-8 flex flex-wrap gap-4 items-center card-glow">
                 <div class="flex-grow">
                     <div class="relative">
                         <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-                        <input id="search-input" type="text" placeholder="Tìm kiếm từ khóa..." class="w-full pl-10 rounded-input border-accent-light shadow-sm">
+                        <input id="search-input" type="text" placeholder="     Tìm kiếm từ khóa..." class="w-full pl-10 rounded-input border-accent-light shadow-sm">
                     </div>
                 </div>
-                <div class="flex space-x-3">
+                
+                <!-- Date Range (Optional) -->
+                <div class="hidden md:flex space-x-3">
                     <input type="date" class="rounded-input border-accent-light shadow-sm">
                     <span class="text-soft self-center">đến</span>
                     <input type="date" class="rounded-input border-accent-light shadow-sm">
                 </div>
+                
+                <!-- Mood Filter -->
                 <div>
                     <select id="mood-filter" onchange="filterTimelineEntries()" class="rounded-input border-accent-light shadow-sm">
                         <option value="">Lọc tâm trạng...</option>
@@ -230,12 +248,23 @@
                         <option value="✨">✨ Tuyệt vời</option>
                     </select>
                 </div>
+                
+                <!-- Type Filter (New) -->
+                <div>
+                    <select id="type-filter" onchange="filterTimelineEntries()" class="rounded-input border-accent-light shadow-sm">
+                        <option value="">Tất cả loại</option>
+                        <option value="entry">Nhật ký</option>
+                        <option value="moment">Khoảnh khắc</option>
+                    </select>
+                </div>
+                
                 <button onclick="clearFilters()" class="text-sm text-soft hover:text-accent transition">
                     <i data-lucide="filter-x" class="w-4 h-4 mr-1"></i>
                     Xóa bộ lọc
                 </button>
             </div>
 
+            <!-- Loading Indicator -->
             <div id="timeline-loading" class="hidden">
                 <div class="flex items-center justify-center p-8">
                     <div class="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
@@ -243,8 +272,10 @@
                 </div>
             </div>
 
+            <!-- Timeline Container -->
             <div class="timeline-container max-w-2xl mx-auto">
                 
+                <!-- Add Moment Button -->
                 <div class="timeline-item flex justify-center">
                     <button class="bg-button text-white p-3 rounded-[24px] text-sm font-semibold shadow-soft hover:opacity-90 transition flex items-center space-x-2 btn-pulse" onclick="showMomentInput()">
                         <i data-lucide="plus" class="w-4 h-4"></i>
@@ -252,6 +283,7 @@
                     </button>
                 </div>
                 
+                <!-- Moment Input Form -->
                 <div id="moment-input" class="bg-card p-6 rounded-card shadow-soft mb-8 hidden card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent">Thêm Khoảnh Khắc</h3>
                     <input id="moment-name" type="text" class="w-full rounded-input border-accent-light shadow-sm mb-3" placeholder="Tên khoảnh khắc (VD: Ăn tối cùng bạn bè)">
@@ -273,30 +305,34 @@
             </div>
         </div>
         
+        <!-- Report Page -->
         <div id="report-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Báo Cáo Tâm Trạng</h1>
 
+            <!-- Stats Cards -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
                     <i data-lucide="award" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
                     <p class="text-sm text-soft mb-2">Ngày tích cực nhất</p>
-                    <p class="text-4xl">✨</p>
-                    <p id="most-positive-day" class="text-xl font-bold text-accent">Thứ 3 tuần trước</p>
+                    <p id="most-positive-mood" class="text-4xl">✨</p>
+                    <p id="most-positive-day" class="text-xl font-bold text-accent">--/--/----</p>
                 </div>
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
                     <i data-lucide="trending-up" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
                     <p class="text-sm text-soft mb-2">Tần suất cao nhất</p>
                     <p id="most-frequent-mood" class="text-4xl">😊</p>
-                    <p id="mood-percentage" class="text-xl font-bold text-accent">50%</p>
+                    <p id="mood-percentage" class="text-xl font-bold text-accent">0%</p>
                 </div>
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
-                    <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
-                    <p class="text-sm text-soft mb-2">Ngày stress nhất</p>
+                    <!-- Sửa icon stress từ alert-circle thành frown hoặc angry -->
+                    <i data-lucide="frown" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
+                    <p class="text-sm text-soft mb-2">Ngày buồn/giận nhất</p>
                     <p id="most-stressful-mood" class="text-4xl">😡</p>
-                    <p id="stressful-day" class="text-xl font-bold text-accent">Thứ 6 tuần này</p>
+                    <p id="stressful-day" class="text-xl font-bold text-accent">--/--/----</p>
                 </div>
             </div>
 
+            <!-- Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-card p-6 rounded-card shadow-soft card-glow">
                     <h2 class="text-xl font-semibold mb-4 flex items-center">
@@ -314,6 +350,7 @@
                 </div>
             </div>
 
+            <!-- Monthly Stats -->
             <div class="mt-8 bg-card p-6 rounded-card shadow-soft card-glow">
                 <h2 class="text-xl font-semibold mb-4 flex items-center">
                     <i data-lucide="calendar" class="w-5 h-5 mr-2"></i>
@@ -322,29 +359,39 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="text-center p-4 bg-accent-light rounded-lg">
                         <p class="text-sm text-soft">Số ngày viết</p>
-                        <p id="days-written" class="text-2xl font-bold text-accent">18</p>
+                        <p id="days-written" class="text-2xl font-bold text-accent">0</p>
                     </div>
                     <div class="text-center p-4 bg-accent-light rounded-lg">
                         <p class="text-sm text-soft">Tỉ lệ tích cực</p>
-                        <p id="positive-rate" class="text-2xl font-bold text-accent">75%</p>
+                        <p id="positive-rate" class="text-2xl font-bold text-accent">0%</p>
                     </div>
                     <div class="text-center p-4 bg-accent-light rounded-lg">
                         <p class="text-sm text-soft">Checklist hoàn thành</p>
-                        <p id="checklist-completed" class="text-2xl font-bold text-accent">64%</p>
+                        <p id="checklist-completed" class="text-2xl font-bold text-accent">0%</p>
                     </div>
                     <div class="text-center p-4 bg-accent-light rounded-lg">
                         <p class="text-sm text-soft">Thời gian trung bình</p>
-                        <p id="avg-time" class="text-2xl font-bold text-accent">15 phút</p>
+                        <p id="avg-time" class="text-2xl font-bold text-accent">0 phút</p>
                     </div>
                 </div>
             </div>
+            
+            <!-- Refresh Button -->
+            <div class="mt-6 text-center">
+                <button onclick="refreshReport()" class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-button transition flex items-center space-x-2 mx-auto">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span>Làm mới báo cáo</span>
+                </button>
+            </div>
         </div>
 
+        <!-- Reflection Page -->
         <div id="reflection-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Reflection Tháng 12</h1>
 
             <div class="bg-card p-6 md:p-10 rounded-card shadow-soft max-w-4xl mx-auto space-y-8 card-glow">
                 
+                <!-- What I Learned -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
                         <i data-lucide="lightbulb" class="w-5 h-5 mr-2"></i>
@@ -353,6 +400,7 @@
                     <textarea id="learned" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Viết những bài học quan trọng bạn đã rút ra."></textarea>
                 </div>
 
+                <!-- What I'm Proud Of -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
                         <i data-lucide="trophy" class="w-5 h-5 mr-2"></i>
@@ -361,6 +409,7 @@
                     <textarea id="proud-of" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Chia sẻ về những thành tựu đã đạt được."></textarea>
                 </div>
 
+                <!-- What to Improve -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
                         <i data-lucide="target" class="w-5 h-5 mr-2"></i>
@@ -369,6 +418,7 @@
                     <textarea id="improvement" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Mục tiêu cho tháng sau hoặc những điểm cần thay đổi."></textarea>
                 </div>
                 
+                <!-- Save Button -->
                 <button onclick="saveReflection()" class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse">
                     <span class="flex items-center justify-center space-x-2">
                         <i data-lucide="save" class="w-5 h-5"></i>
@@ -383,43 +433,16 @@
     <!-- Notification Container -->
     <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <script type="module">
-        // Import tất cả các hàm cần thiết
-        import { 
-            switchView, 
-            toggleThemePanel, 
-            showMomentInput, 
-            saveDailyEntry, 
-            loadTimelineEntries, 
-            filterTimelineEntries,
-            saveMoment,
-            saveReflection,
-            showNotification,
-            clearFilters,
-            exportData,
-            initializeAppData
-        } from './app.js'; 
-        import { setTheme } from './theme.js';
+    <!-- Scripts -->
+     <script type="module">
+        import { initializeApp } from './app.js';
         
-        // Gán các hàm vào window để có thể gọi từ HTML (onclick/onchange)
-        window.switchView = switchView;
-        window.toggleThemePanel = toggleThemePanel;
-        window.setTheme = setTheme;
-        window.showMomentInput = showMomentInput;
-        window.filterTimelineEntries = filterTimelineEntries;
-        window.saveDailyEntry = saveDailyEntry;
-        window.saveMoment = saveMoment;
-        window.saveReflection = saveReflection;
-        window.clearFilters = clearFilters;
-        window.exportData = exportData;
-        
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeAppData();
-        });
+        // Khởi tạo app khi DOM sẵn sàng
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
     </script>
-    <script type="module" src="theme.js"></script>
-    <script type="module" src="reportChart.js"></script>
-    <script type="module" src="app.js"></script>
 </body>
 </html>
