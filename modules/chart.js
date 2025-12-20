@@ -1,4 +1,4 @@
-// modules/chart.js
+// modules/chart.js (Optimized)
 import { StorageManager } from './storage.js';
 
 const MOOD_VALUES = { '😢': 1, '😡': 2, '😴': 3, '😊': 4, '✨': 5 };
@@ -16,16 +16,25 @@ export class ChartManager {
     static generateWeeklyData(entries) {
         const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
         const data = [];
+        const today = new Date();
 
         for (let i = 6; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
             const dateStr = date.toLocaleDateString('vi-VN', { 
                 year: 'numeric', 
                 month: '2-digit', 
                 day: '2-digit' 
             });
-            const entry = entries.find(e => e.date === dateStr);
+            
+            let entry = null;
+            // Sử dụng for loop thay vì find để tối ưu
+            for (let j = 0; j < entries.length; j++) {
+                if (entries[j].date === dateStr) {
+                    entry = entries[j];
+                    break;
+                }
+            }
 
             data.push({
                 day: days[date.getDay()],
@@ -48,7 +57,13 @@ export class ChartManager {
         container.innerHTML = '';
         
         // Check if there are any entries this week
-        const hasEntriesThisWeek = data.some(d => d.hasEntry);
+        let hasEntriesThisWeek = false;
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].hasEntry) {
+                hasEntriesThisWeek = true;
+                break;
+            }
+        }
         
         if (!hasEntriesThisWeek) {
             container.innerHTML = `
@@ -62,6 +77,8 @@ export class ChartManager {
             return;
         }
 
+        // Tạo SVG với document fragment để tối ưu
+        const fragment = document.createDocumentFragment();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute('viewBox', '0 0 500 300');
         svg.setAttribute('width', '100%');
@@ -72,65 +89,58 @@ export class ChartManager {
         const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
         const softTextColor = getComputedStyle(document.body).getPropertyValue('--text-soft').trim();
 
-        data.forEach((item, index) => {
-            const x = 80 + index * 60;
+        // Draw bars
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+            const x = 80 + i * 60;
             const barHeight = item.hasEntry ? (item.moodValue / 5) * 180 : 10;
             const y = 240 - barHeight;
 
             // Bar
             const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute('x', x - 20);
-            rect.setAttribute('y', y);
+            rect.setAttribute('x', (x - 20).toString());
+            rect.setAttribute('y', y.toString());
             rect.setAttribute('width', '40');
-            rect.setAttribute('height', barHeight);
+            rect.setAttribute('height', barHeight.toString());
             rect.setAttribute('fill', item.hasEntry ? buttonColor : '#E5E7EB');
             rect.setAttribute('rx', '8');
             rect.setAttribute('opacity', item.hasEntry ? '0.8' : '0.3');
-            rect.style.transition = 'all 0.3s ease';
             
-            // Add hover effect
-            rect.addEventListener('mouseenter', () => {
-                rect.setAttribute('opacity', '1');
-            });
-            rect.addEventListener('mouseleave', () => {
-                rect.setAttribute('opacity', item.hasEntry ? '0.8' : '0.3');
-            });
-            
-            svg.appendChild(rect);
-
             // Day label
             const dayText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            dayText.setAttribute('x', x);
+            dayText.setAttribute('x', x.toString());
             dayText.setAttribute('y', '270');
             dayText.setAttribute('text-anchor', 'middle');
             dayText.setAttribute('fill', softTextColor);
             dayText.setAttribute('font-weight', 'bold');
             dayText.textContent = item.day;
+
+            svg.appendChild(rect);
             svg.appendChild(dayText);
 
             // Mood emoji (only if has entry)
             if (item.hasEntry && item.mood && item.moodValue > 0) {
                 const moodText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                moodText.setAttribute('x', x);
-                moodText.setAttribute('y', y - 10);
+                moodText.setAttribute('x', x.toString());
+                moodText.setAttribute('y', (y - 10).toString());
                 moodText.setAttribute('text-anchor', 'middle');
                 moodText.setAttribute('fill', buttonColor);
                 moodText.setAttribute('font-size', '20');
                 moodText.textContent = item.mood;
                 svg.appendChild(moodText);
             }
-        });
+        }
 
         // Y-axis labels
         for (let i = 1; i <= 5; i++) {
             const y = 240 - (i / 5) * 180;
             const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
             label.setAttribute('x', '50');
-            label.setAttribute('y', y + 3);
+            label.setAttribute('y', (y + 3).toString());
             label.setAttribute('text-anchor', 'end');
             label.setAttribute('fill', softTextColor);
             label.setAttribute('font-size', '12');
-            label.textContent = i;
+            label.textContent = i.toString();
             svg.appendChild(label);
         }
 
@@ -153,7 +163,8 @@ export class ChartManager {
         yAxis.setAttribute('stroke-width', '2');
         svg.appendChild(yAxis);
 
-        container.appendChild(svg);
+        fragment.appendChild(svg);
+        container.appendChild(fragment);
     }
 
     static generateMoodFrequencyData(entries) {
@@ -165,11 +176,12 @@ export class ChartManager {
             '✨': 0
         };
 
-        entries.forEach(entry => {
-            if (moodCounts.hasOwnProperty(entry.mood)) {
-                moodCounts[entry.mood]++;
+        for (let i = 0; i < entries.length; i++) {
+            const mood = entries[i].mood;
+            if (moodCounts.hasOwnProperty(mood)) {
+                moodCounts[mood]++;
             }
-        });
+        }
 
         return moodCounts;
     }
@@ -180,7 +192,12 @@ export class ChartManager {
 
         const entries = StorageManager.get('diaryEntries', []);
         const moodCounts = this.generateMoodFrequencyData(entries);
-        const total = Object.values(moodCounts).reduce((sum, count) => sum + count, 0);
+        
+        let total = 0;
+        const counts = Object.values(moodCounts);
+        for (let i = 0; i < counts.length; i++) {
+            total += counts[i];
+        }
 
         container.innerHTML = '';
 
@@ -196,6 +213,7 @@ export class ChartManager {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute('viewBox', '0 0 200 200');
         svg.setAttribute('width', '200');
@@ -207,16 +225,13 @@ export class ChartManager {
         const radius = 80;
 
         let cumulativeAngle = 0;
-        const percentages = {};
+        const moodEntries = Object.entries(moodCounts);
         
-        Object.entries(moodCounts).forEach(([mood, count]) => {
+        // Draw pie slices
+        for (let i = 0; i < moodEntries.length; i++) {
+            const [mood, count] = moodEntries[i];
             if (count > 0) {
-                percentages[mood] = (count / total) * 100;
-            }
-        });
-
-        Object.entries(percentages).forEach(([mood, percentage]) => {
-            if (percentage > 0) {
+                const percentage = (count / total) * 100;
                 const angle = (percentage / 100) * 360;
                 const startAngle = cumulativeAngle;
                 const endAngle = startAngle + angle;
@@ -249,45 +264,27 @@ export class ChartManager {
                 svg.appendChild(path);
                 cumulativeAngle += angle;
             }
-        });
+        }
 
         // Add center circle
         const centerCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        centerCircle.setAttribute('cx', centerX);
-        centerCircle.setAttribute('cy', centerY);
-        centerCircle.setAttribute('r', radius * 0.3);
+        centerCircle.setAttribute('cx', centerX.toString());
+        centerCircle.setAttribute('cy', centerY.toString());
+        centerCircle.setAttribute('r', (radius * 0.3).toString());
         centerCircle.setAttribute('fill', 'white');
         svg.appendChild(centerCircle);
 
-        // Add total count in center
-        const totalText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        totalText.setAttribute('x', centerX);
-        totalText.setAttribute('y', centerY);
-        totalText.setAttribute('text-anchor', 'middle');
-        totalText.setAttribute('dy', '5');
-        totalText.setAttribute('font-weight', 'bold');
-        totalText.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--accent').trim());
-        totalText.textContent = total;
-        svg.appendChild(totalText);
-
-        const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        labelText.setAttribute('x', centerX);
-        labelText.setAttribute('y', centerY + 15);
-        labelText.setAttribute('text-anchor', 'middle');
-        labelText.setAttribute('font-size', '10');
-        labelText.setAttribute('fill', getComputedStyle(document.body).getPropertyValue('--text-soft').trim());
-        labelText.textContent = 'mục';
-        svg.appendChild(labelText);
-
-        container.appendChild(svg);
+        fragment.appendChild(svg);
+        container.appendChild(fragment);
         
         // Create legend
         const legend = document.createElement('div');
         legend.className = 'mt-6 flex flex-col gap-2';
         
-        Object.entries(percentages).forEach(([mood, percentage]) => {
-            if (percentage > 0) {
-                const count = moodCounts[mood];
+        for (let i = 0; i < moodEntries.length; i++) {
+            const [mood, count] = moodEntries[i];
+            if (count > 0) {
+                const percentage = Math.round((count / total) * 100);
                 const legendItem = document.createElement('div');
                 legendItem.className = 'flex items-center justify-between';
                 legendItem.innerHTML = `
@@ -295,11 +292,11 @@ export class ChartManager {
                         <span class="w-4 h-4 rounded-full" style="background-color: ${MOOD_COLORS[mood]}"></span>
                         <span class="text-sm">${mood} ${MOOD_LABELS[mood]}</span>
                     </div>
-                    <div class="text-sm font-semibold">${Math.round(percentage)}% (${count})</div>
+                    <div class="text-sm font-semibold">${percentage}% (${count})</div>
                 `;
                 legend.appendChild(legendItem);
             }
-        });
+        }
         
         container.appendChild(legend);
     }
@@ -307,93 +304,122 @@ export class ChartManager {
     static updateReportStats() {
         const entries = StorageManager.get('diaryEntries', []);
         
-        const setText = (id, text) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = text;
-        };
-
         if (entries.length === 0) {
-            setText('most-positive-day', '--/--/----');
-            setText('stressful-day', '--/--/----');
-            setText('days-written', '0');
-            setText('positive-rate', '0%');
-            setText('checklist-completed', '0%');
-            setText('avg-time', '0 phút');
-            setText('most-frequent-mood', '😊');
-            setText('mood-percentage', '0%');
-            setText('most-positive-mood', '✨');
-            setText('most-stressful-mood', '😡');
+            this.setEmptyStats();
             return;
         }
 
-        // Tính toán các thống kê
-        const moodValues = entries.map(e => ({
-            date: e.date,
-            mood: e.mood,
-            moodValue: MOOD_VALUES[e.mood] || 3,
-            contentLength: e.content?.length || 0
-        }));
-
-        // Ngày tích cực nhất (mood value cao nhất)
-        const mostPositive = moodValues.reduce((max, curr) => 
-            curr.moodValue > max.moodValue ? curr : max, 
-            {moodValue: 0, date: '--/--/----', mood: '✨'}
-        );
-
-        // Ngày stress nhất (mood value thấp nhất)
-        const mostStressful = moodValues.reduce((min, curr) => 
-            curr.moodValue < min.moodValue ? curr : min, 
-            {moodValue: 6, date: '--/--/----', mood: '😡'}
-        );
-
-        // Cập nhật các thống kê
-        setText('most-positive-day', mostPositive.date || '--/--/----');
-        setText('most-positive-mood', mostPositive.mood || '✨');
-        setText('stressful-day', mostStressful.date || '--/--/----');
-        setText('most-stressful-mood', mostStressful.mood || '😡');
-        setText('days-written', entries.length);
-
-        // Tỉ lệ tích cực
-        const positiveEntries = entries.filter(e => e.mood === '😊' || e.mood === '✨').length;
-        setText('positive-rate', `${Math.round((positiveEntries / entries.length) * 100)}%`);
-
-        // Checklist hoàn thành
+        // Pre-calculate values
+        let mostPositive = { moodValue: 0, date: '--/--/----', mood: '✨' };
+        let mostStressful = { moodValue: 6, date: '--/--/----', mood: '😡' };
         let totalChecklistItems = 0;
         let completedChecklistItems = 0;
+        let totalChars = 0;
+        let positiveEntries = 0;
         
-        entries.forEach(e => {
-            totalChecklistItems += 6; // 6 items trong checklist
-            completedChecklistItems += e.selfCare?.length || 0;
-        });
+        const moodCounts = {
+            '😢': 0, '😡': 0, '😴': 0, '😊': 0, '✨': 0
+        };
         
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            const moodValue = MOOD_VALUES[entry.mood] || 3;
+            
+            // Update most positive/stressful
+            if (moodValue > mostPositive.moodValue) {
+                mostPositive = { moodValue, date: entry.date, mood: entry.mood };
+            }
+            if (moodValue < mostStressful.moodValue) {
+                mostStressful = { moodValue, date: entry.date, mood: entry.mood };
+            }
+            
+            // Count positive entries
+            if (entry.mood === '😊' || entry.mood === '✨') {
+                positiveEntries++;
+            }
+            
+            // Checklist items
+            totalChecklistItems += 6;
+            completedChecklistItems += entry.selfCare?.length || 0;
+            
+            // Character count
+            totalChars += entry.content?.length || 0;
+            
+            // Mood frequency
+            if (moodCounts.hasOwnProperty(entry.mood)) {
+                moodCounts[entry.mood]++;
+            }
+        }
+
+        // Update DOM elements
+        this.setText('most-positive-day', mostPositive.date || '--/--/----');
+        this.setText('most-positive-mood', mostPositive.mood || '✨');
+        this.setText('stressful-day', mostStressful.date || '--/--/----');
+        this.setText('most-stressful-mood', mostStressful.mood || '😡');
+        this.setText('days-written', entries.length.toString());
+
+        // Positive rate
+        const positiveRate = Math.round((positiveEntries / entries.length) * 100);
+        this.setText('positive-rate', `${positiveRate}%`);
+
+        // Checklist percentage
         const checklistPercentage = totalChecklistItems > 0 
             ? Math.round((completedChecklistItems / totalChecklistItems) * 100)
             : 0;
-        setText('checklist-completed', `${checklistPercentage}%`);
+        this.setText('checklist-completed', `${checklistPercentage}%`);
 
-        // Thời gian viết trung bình (ước tính)
-        const totalChars = entries.reduce((sum, e) => sum + (e.content?.length || 0), 0);
+        // Average writing time
         const avgCharsPerEntry = entries.length > 0 ? totalChars / entries.length : 0;
-        // Ước tính: 50 ký tự = 1 phút viết
         const avgMinutes = Math.max(1, Math.round(avgCharsPerEntry / 50));
-        setText('avg-time', `${avgMinutes} phút`);
+        this.setText('avg-time', `${avgMinutes} phút`);
 
-        // Tần suất mood phổ biến nhất
-        const moodCounts = this.generateMoodFrequencyData(entries);
-        const totalCount = Object.values(moodCounts).reduce((a, b) => a + b, 0);
+        // Most frequent mood
+        let mostFrequentMood = '😊';
+        let maxCount = 0;
+        let totalCount = 0;
+        
+        const moodEntries = Object.entries(moodCounts);
+        for (let i = 0; i < moodEntries.length; i++) {
+            const [mood, count] = moodEntries[i];
+            totalCount += count;
+            if (count > maxCount) {
+                maxCount = count;
+                mostFrequentMood = mood;
+            }
+        }
         
         if (totalCount > 0) {
-            const mostFrequent = Object.entries(moodCounts).reduce((a, b) => 
-                a[1] > b[1] ? a : b
-            );
-            const percentage = Math.round((mostFrequent[1] / totalCount) * 100);
-            
-            setText('most-frequent-mood', mostFrequent[0]);
-            setText('mood-percentage', `${percentage}%`);
+            const percentage = Math.round((maxCount / totalCount) * 100);
+            this.setText('most-frequent-mood', mostFrequentMood);
+            this.setText('mood-percentage', `${percentage}%`);
         } else {
-            setText('most-frequent-mood', '😊');
-            setText('mood-percentage', '0%');
+            this.setText('most-frequent-mood', '😊');
+            this.setText('mood-percentage', '0%');
         }
+    }
+
+    static setEmptyStats() {
+        const elements = {
+            'most-positive-day': '--/--/----',
+            'most-positive-mood': '✨',
+            'stressful-day': '--/--/----',
+            'most-stressful-mood': '😡',
+            'days-written': '0',
+            'positive-rate': '0%',
+            'checklist-completed': '0%',
+            'avg-time': '0 phút',
+            'most-frequent-mood': '😊',
+            'mood-percentage': '0%'
+        };
+        
+        for (const [id, text] of Object.entries(elements)) {
+            this.setText(id, text);
+        }
+    }
+
+    static setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
     }
 
     static drawCharts() {

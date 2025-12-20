@@ -1,4 +1,4 @@
-// app.js - Main App Initialization
+// app.js - Main App Initialization (Optimized)
 import { StorageManager } from './modules/storage.js';
 import { initTheme, setTheme } from './modules/theme.js';
 import { DiaryManager } from './modules/diary.js';
@@ -6,7 +6,6 @@ import { TimelineManager } from './modules/timeline.js';
 import { ReflectionManager } from './modules/reflection.js';
 import { Utils } from './modules/utils.js';
 import { ChartManager } from './modules/chart.js';
-import { ReportManager } from './modules/report.js';
 
 // App State
 export const APP_STATE = {
@@ -22,24 +21,45 @@ export const APP_STATE = {
     }
 };
 
+// Cache DOM elements
+let cachedElements = {};
+const getElement = (id) => {
+    if (!cachedElements[id]) {
+        cachedElements[id] = document.getElementById(id);
+    }
+    return cachedElements[id];
+};
+
+// Throttle function for performance
+const throttle = (func, limit) => {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    };
+};
+
 // Export functions for HTML onclick handlers
 export function saveDailyEntry() { 
     const result = DiaryManager.saveDailyEntry();
     if (result) {
         Utils.updateStreakCounter();
         setTimeout(() => {
-            Utils.showNotification('Nhật ký đã được lưu và reset sẵn sàng cho ngày mới! 🎉', 'success');
+            Utils.showNotification('Nhật ký đã được lưu! 🎉', 'success');
         }, 500);
     }
     return result;
 }
 
-// Thêm hàm mới: Edit entry
 export function editEntry(entryId) {
     return DiaryManager.loadEntryForEdit(entryId);
 }
 
-// Thêm hàm mới: Delete entry
 export function deleteEntry(entryId) {
     if (confirm('Bạn có chắc chắn muốn xóa nhật ký này không?')) {
         return DiaryManager.deleteEntry(entryId);
@@ -48,8 +68,8 @@ export function deleteEntry(entryId) {
 }
 
 export function saveMoment() { 
-    const name = document.getElementById('moment-name')?.value.trim();
-    const desc = document.getElementById('moment-desc')?.value.trim();
+    const name = getElement('moment-name')?.value.trim();
+    const desc = getElement('moment-desc')?.value.trim();
     
     if (!name) {
         Utils.showNotification('Vui lòng nhập tên khoảnh khắc', 'warning');
@@ -77,9 +97,9 @@ export function saveMoment() {
     moments.unshift(momentData);
     StorageManager.set('moments', moments);
     
-    document.getElementById('moment-name').value = '';
-    document.getElementById('moment-desc').value = '';
-    document.getElementById('moment-input').classList.add('hidden');
+    getElement('moment-name').value = '';
+    getElement('moment-desc').value = '';
+    getElement('moment-input').classList.add('hidden');
     
     Utils.showNotification('Khoảnh khắc đã được lưu! 🌟', 'success');
     
@@ -92,10 +112,6 @@ export function saveMoment() {
 
 export function saveReflection() { 
     return ReflectionManager.saveReflection(); 
-}
-
-export function showNotification(message, type) { 
-    return Utils.showNotification(message, type); 
 }
 
 export function updateStreakCounter() { 
@@ -111,27 +127,29 @@ export function clearFilters() {
 }
 
 export function switchView(viewName) {
-    console.log('Switching to view:', viewName);
+    // Prevent unnecessary view switches
+    if (APP_STATE.currentView === viewName) return;
     
     APP_STATE.currentView = viewName;
     
     // Hide all views
-    document.querySelectorAll('.view').forEach(view => {
-        view.classList.add('hidden');
-    });
+    const views = document.querySelectorAll('.view');
+    for (let i = 0; i < views.length; i++) {
+        views[i].classList.add('hidden');
+    }
 
     // Show active view
-    const activeView = document.getElementById(`${viewName}-page`);
+    const activeView = getElement(`${viewName}-page`);
     if (activeView) {
-        console.log('Showing view:', activeView.id);
         activeView.classList.remove('hidden');
     }
     
     // Update active nav button
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.classList.remove('bg-accent-light', 'font-bold');
-        btn.style.backgroundColor = '';
-    });
+    const navItems = document.querySelectorAll('.nav-item');
+    for (let i = 0; i < navItems.length; i++) {
+        navItems[i].classList.remove('bg-accent-light', 'font-bold');
+        navItems[i].style.backgroundColor = '';
+    }
     
     const activeBtn = document.querySelector(`.nav-item[data-view="${viewName}"]`);
     if (activeBtn) {
@@ -143,37 +161,30 @@ export function switchView(viewName) {
     // Execute view-specific actions
     switch (viewName) {
         case 'diary':
-            console.log('Loading diary...');
             DiaryManager.loadTodayEntry();
             break;
         case 'report':
-            console.log('Loading report...');
             if (ChartManager) {
                 ChartManager.drawCharts();
             }
             break;
         case 'timeline':
-            console.log('Loading timeline...');
             if (TimelineManager) {
                 TimelineManager.loadTimelineEntries();
             }
             break;
         case 'reflection':
-            console.log('Loading reflection...');
             if (ReflectionManager) {
                 ReflectionManager.loadReflection();
             }
             break;
     }
     
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     return true;
 }
 
 export function toggleThemePanel() {
-    const panel = document.getElementById('theme-panel');
+    const panel = getElement('theme-panel');
     if (panel.classList.contains('hidden')) {
         panel.classList.remove('hidden');
         panel.classList.add('animate-fadeIn');
@@ -188,17 +199,17 @@ export function toggleThemePanel() {
 }
 
 export function showMomentInput() {
-    const momentInput = document.getElementById('moment-input');
+    const momentInput = getElement('moment-input');
     if (momentInput.classList.contains('hidden')) {
         momentInput.classList.remove('hidden');
         momentInput.classList.add('animate-fadeIn');
         momentInput.classList.remove('animate-fadeOut');
         
-        document.getElementById('moment-name').value = '';
-        document.getElementById('moment-desc').value = '';
+        getElement('moment-name').value = '';
+        getElement('moment-desc').value = '';
         
         setTimeout(() => {
-            document.getElementById('moment-name').focus();
+            getElement('moment-name').focus();
         }, 100);
     } else {
         momentInput.classList.add('animate-fadeOut');
@@ -215,46 +226,47 @@ export function filterTimelineEntries() {
     }
 }
 
-export function resizeChart() {
+export const resizeChart = throttle(() => {
     if (APP_STATE.currentView === 'report' && ChartManager) {
         ChartManager.drawCharts();
     }
-}
+}, 250);
 
 // Setup event listeners
 function setupMoodSelector() {
-    document.querySelectorAll('.mood-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
+    const moodButtons = document.querySelectorAll('.mood-btn');
+    for (let i = 0; i < moodButtons.length; i++) {
+        moodButtons[i].addEventListener('click', function(e) {
             const buttonColor = getComputedStyle(document.body).getPropertyValue('--button-bg');
             const accentLightColor = getComputedStyle(document.body).getPropertyValue('--accent-light');
             
             // Remove active state from all buttons
-            document.querySelectorAll('.mood-btn').forEach(btn => {
-                btn.style.backgroundColor = accentLightColor;
-                btn.classList.remove('ring-4', 'ring-offset-2', 'ring-accent-light/50');
-            });
+            for (let j = 0; j < moodButtons.length; j++) {
+                moodButtons[j].style.backgroundColor = accentLightColor;
+                moodButtons[j].classList.remove('ring-4', 'ring-offset-2', 'ring-accent-light/50');
+            }
 
             // Set active state for clicked button
-            e.currentTarget.style.backgroundColor = buttonColor;
-            e.currentTarget.classList.add('ring-4', 'ring-offset-2', 'ring-accent-light/50');
+            this.style.backgroundColor = buttonColor;
+            this.classList.add('ring-4', 'ring-offset-2', 'ring-accent-light/50');
             
             // Click animation
-            e.currentTarget.style.transform = 'scale(0.95)';
+            this.style.transform = 'scale(0.95)';
             setTimeout(() => {
-                e.currentTarget.style.transform = '';
+                this.style.transform = '';
             }, 150);
         });
-    });
+    }
 }
 
 function setupSelfCareChecklist() {
-    document.querySelectorAll('.pastel-checkbox').forEach(label => {
-        const input = label.querySelector('input[type="checkbox"]');
-        
-        label.addEventListener('click', (e) => {
+    const checkboxes = document.querySelectorAll('.pastel-checkbox');
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].addEventListener('click', function(e) {
+            const input = this.querySelector('input[type="checkbox"]');
             setTimeout(() => {
                 if (input.checked) {
-                    const icon = label.querySelector('.checkbox-icon');
+                    const icon = this.querySelector('.checkbox-icon');
                     icon.classList.add('animate-bounce-once');
                     setTimeout(() => {
                         icon.classList.remove('animate-bounce-once');
@@ -262,7 +274,7 @@ function setupSelfCareChecklist() {
                 }
             }, 0);
         });
-    });
+    }
 }
 
 function setupAutoSave() {
@@ -271,7 +283,7 @@ function setupAutoSave() {
     const autoSave = () => {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
-            const indicator = document.getElementById('save-status');
+            const indicator = getElement('save-status');
             if (indicator) {
                 indicator.textContent = 'Đang lưu...';
                 indicator.classList.add('text-blue-500');
@@ -284,15 +296,27 @@ function setupAutoSave() {
         }, 2000);
     };
     
-    document.querySelectorAll('textarea, input[type="text"]').forEach(el => {
-        el.addEventListener('input', autoSave);
-    });
+    const inputs = document.querySelectorAll('textarea, input[type="text"]');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('input', autoSave);
+    }
 }
+
+// Debounce function
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
 // Initialize the app
 export function initializeApp() {
-    console.log('Initializing app...');
-    
     // Initialize Lucide icons
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
@@ -312,7 +336,7 @@ export function initializeApp() {
         day: '2-digit'
     });
     
-    const dateElement = document.getElementById('current-date');
+    const dateElement = getElement('current-date');
     if (dateElement) {
         dateElement.textContent = dateString;
     }
@@ -332,20 +356,22 @@ export function initializeApp() {
     // Set initial view
     switchView(APP_STATE.currentView);
     
-    // Setup search functionality
-    const searchInput = document.getElementById('search-input');
+    // Setup search functionality with debounce
+    const searchInput = getElement('search-input');
     if (searchInput) {
-        searchInput.addEventListener('input', () => {
+        const debouncedSearch = debounce(() => {
             if (TimelineManager) {
                 TimelineManager.loadTimelineEntries();
             }
-        });
+        }, 300);
+        
+        searchInput.addEventListener('input', debouncedSearch);
     }
     
     // Close theme panel when clicking outside
     document.addEventListener('click', (e) => {
-        const themePanel = document.getElementById('theme-panel');
-        const themeToggle = document.getElementById('theme-toggle');
+        const themePanel = getElement('theme-panel');
+        const themeToggle = getElement('theme-toggle');
         
         if (themePanel && !themePanel.contains(e.target) && 
             themeToggle && !themeToggle.contains(e.target) &&
@@ -353,6 +379,9 @@ export function initializeApp() {
             toggleThemePanel();
         }
     });
+    
+    // Add resize listener with throttling
+    window.addEventListener('resize', resizeChart);
     
     console.log('App initialized successfully!');
 }
@@ -369,12 +398,8 @@ window.saveReflection = saveReflection;
 window.clearFilters = clearFilters;
 window.exportData = exportData;
 window.resizeChart = resizeChart;
-window.editEntry = editEntry;  // Thêm hàm edit
-window.deleteEntry = deleteEntry;  // Thêm hàm delete
-
-window.TimelineManager = TimelineManager;
-window.ChartManager = ChartManager;
-window.ReportManager = ReportManager;
+window.editEntry = editEntry;
+window.deleteEntry = deleteEntry;
 
 // Thêm hàm refreshReport cho button trong HTML
 window.refreshReport = function() {

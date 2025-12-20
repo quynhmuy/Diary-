@@ -1,4 +1,4 @@
-// modules/timeline.js
+// modules/timeline.js (Optimized)
 import { StorageManager } from './storage.js';
 import { Utils } from './utils.js';
 
@@ -18,23 +18,23 @@ export class TimelineManager {
             const diaryEntries = StorageManager.get('diaryEntries', []);
             const moments = StorageManager.get('moments', []);
             
-            // Combine and sort by timestamp (newest first)
-            let allEntries = [
-                ...diaryEntries.map(entry => ({ ...entry, type: 'entry' })),
-                ...moments.map(moment => ({ ...moment, type: 'moment' }))
-            ].sort((a, b) => {
-                return (b.timestamp || 0) - (a.timestamp || 0);
-            });
+            // Combine entries - sử dụng concat thay vì spread operator cho hiệu suất
+            let allEntries = diaryEntries.map(entry => ({ ...entry, type: 'entry' }))
+                .concat(moments.map(moment => ({ ...moment, type: 'moment' })));
+            
+            // Sort by timestamp (newest first)
+            allEntries.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
             
             // Apply filters
             allEntries = this.applyFilters(allEntries);
             
             // Clear existing items (except static items)
             const existingItems = timelineContainer.querySelectorAll('.timeline-item');
-            const staticItems = Array.from(existingItems).slice(0, 2); // Giữ lại button và moment input
-            const dynamicItems = Array.from(existingItems).slice(2);
+            const dynamicItems = Array.from(existingItems).slice(2); // Bỏ qua 2 phần tử đầu
             
-            dynamicItems.forEach(item => item.remove());
+            for (let i = 0; i < dynamicItems.length; i++) {
+                dynamicItems[i].remove();
+            }
             
             // Hiển thị timeline items container
             let timelineItemsContainer = document.getElementById('timeline-items-container');
@@ -68,11 +68,15 @@ export class TimelineManager {
             }
             
             // Add entries to timeline với animation delay
-            allEntries.forEach((entry, index) => {
-                const timelineItem = this.createTimelineItem(entry, index);
-                timelineItem.style.animationDelay = `${index * 0.1}s`;
-                timelineItemsContainer.appendChild(timelineItem);
-            });
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < allEntries.length; i++) {
+                const entry = allEntries[i];
+                const timelineItem = this.createTimelineItem(entry, i);
+                timelineItem.style.animationDelay = `${i * 0.1}s`;
+                fragment.appendChild(timelineItem);
+            }
+            
+            timelineItemsContainer.appendChild(fragment);
             
             // Ẩn loading
             if (loadingElement) {
@@ -94,55 +98,73 @@ export class TimelineManager {
     }
     
     static applyFilters(entries) {
-        // Search filter
+        // Get filter values
         const searchInput = document.getElementById('search-input');
         const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
         
-        // Mood filter
         const moodFilter = document.getElementById('mood-filter');
         const moodValue = moodFilter ? moodFilter.value : '';
         
-        // Type filter
         const typeFilter = document.getElementById('type-filter');
         const typeValue = typeFilter ? typeFilter.value : '';
         
-        return entries.filter(entry => {
+        // Nếu không có filter, trả về tất cả
+        if (!searchTerm && !moodValue && !typeValue) {
+            return entries;
+        }
+        
+        const filtered = [];
+        
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            let passed = true;
+            
             // Search filter
             if (searchTerm) {
-                const searchableText = [
-                    entry.content || '',
-                    entry.achievements || '',
-                    entry.stress || '',
-                    entry.highlight || '',
-                    entry.name || '',
-                    entry.description || '',
-                    entry.gratitude1 || '',
-                    entry.gratitude2 || '',
-                    entry.gratitude3 || ''
-                ].join(' ').toLowerCase();
+                let searchableText = '';
+                if (entry.type === 'entry') {
+                    searchableText = [
+                        entry.content || '',
+                        entry.achievements || '',
+                        entry.stress || '',
+                        entry.highlight || '',
+                        entry.gratitude1 || '',
+                        entry.gratitude2 || '',
+                        entry.gratitude3 || ''
+                    ].join(' ').toLowerCase();
+                } else {
+                    searchableText = [
+                        entry.name || '',
+                        entry.description || ''
+                    ].join(' ').toLowerCase();
+                }
                 
                 if (!searchableText.includes(searchTerm)) {
-                    return false;
+                    passed = false;
                 }
             }
             
             // Mood filter
-            if (moodValue && entry.mood !== moodValue) {
-                return false;
+            if (passed && moodValue && entry.mood !== moodValue) {
+                passed = false;
             }
             
             // Type filter
-            if (typeValue) {
+            if (passed && typeValue) {
                 if (typeValue === 'entry' && entry.type !== 'entry') {
-                    return false;
+                    passed = false;
                 }
                 if (typeValue === 'moment' && entry.type !== 'moment') {
-                    return false;
+                    passed = false;
                 }
             }
             
-            return true;
-        });
+            if (passed) {
+                filtered.push(entry);
+            }
+        }
+        
+        return filtered;
     }
     
     static createTimelineItem(entry, index) {
@@ -151,8 +173,12 @@ export class TimelineManager {
         item.className = 'timeline-item';
         
         if (isDiaryEntry) {
-            // Diary entry template với nút sửa/xóa
-            item.innerHTML = `
+            // Diary entry template
+            const hasPhotos = entry.photos && entry.photos.length > 0;
+            const hasSelfCare = entry.selfCare && entry.selfCare.length > 0;
+            const hasGratitude = entry.gratitude1 || entry.gratitude2 || entry.gratitude3;
+            
+            let content = `
                 <div class="bg-card p-6 rounded-card shadow-soft card-glow hover:transform hover:scale-[1.02] transition-all duration-300">
                     <div class="flex justify-between items-start mb-3">
                         <div>
@@ -172,83 +198,107 @@ export class TimelineManager {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    
-                    ${entry.highlight ? `
-                        <div class="mb-4 p-3 rounded-lg bg-yellow-50 border border-yellow-100">
-                            <div class="flex items-center text-yellow-800 mb-1">
-                                <i data-lucide="star" class="w-4 h-4 mr-2"></i>
-                                <span class="font-semibold">Khoảnh khắc đẹp:</span>
-                            </div>
-                            <p class="text-sm">${entry.highlight}</p>
+                    </div>`;
+            
+            if (entry.highlight) {
+                content += `
+                    <div class="mb-4 p-3 rounded-lg bg-yellow-50 border border-yellow-100">
+                        <div class="flex items-center text-yellow-800 mb-1">
+                            <i data-lucide="star" class="w-4 h-4 mr-2"></i>
+                            <span class="font-semibold">Khoảnh khắc đẹp:</span>
                         </div>
-                    ` : ''}
-                    
-                    ${entry.achievements ? `
-                        <div class="mb-3">
-                            <span class="font-semibold text-accent">🎯 Thành tựu:</span>
-                            <p class="text-sm mt-1">${entry.achievements}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${entry.stress ? `
-                        <div class="mb-3">
-                            <span class="font-semibold text-accent">⚠️ Căng thẳng:</span>
-                            <p class="text-sm mt-1">${entry.stress}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${entry.content ? `
-                        <div class="mb-3">
-                            <span class="font-semibold text-accent">📝 Nội dung:</span>
-                            <p class="text-sm mt-1 line-clamp-3">${entry.content}</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${entry.gratitude1 || entry.gratitude2 || entry.gratitude3 ? `
-                        <div class="mb-3">
-                            <span class="font-semibold text-accent">🙏 Biết ơn:</span>
-                            <ul class="text-sm mt-1 space-y-1">
-                                ${entry.gratitude1 ? `<li>• ${entry.gratitude1}</li>` : ''}
-                                ${entry.gratitude2 ? `<li>• ${entry.gratitude2}</li>` : ''}
-                                ${entry.gratitude3 ? `<li>• ${entry.gratitude3}</li>` : ''}
-                            </ul>
-                        </div>
-                    ` : ''}
-                    
-                    ${entry.selfCare && entry.selfCare.length > 0 ? `
-                        <div class="mt-4 pt-3 border-t border-gray-100">
-                            <span class="font-semibold text-accent">💆‍♀️ Self-care:</span>
-                            <div class="flex flex-wrap gap-1 mt-2">
-                                ${entry.selfCare.map(item => `
-                                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">${item}</span>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    ${entry.photos && entry.photos.length > 0 ? `
-                        <div class="mt-4 pt-3 border-t border-gray-100">
-                            <span class="font-semibold text-accent">📸 Ảnh:</span>
-                            <div class="flex space-x-2 mt-2 overflow-x-auto">
-                                ${entry.photos.slice(0, 3).map(photo => `
-                                    <img src="${photo}" alt="Photo" class="w-20 h-20 object-cover rounded-lg flex-shrink-0">
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
+                        <p class="text-sm">${entry.highlight}</p>
+                    </div>`;
+            }
+            
+            if (entry.achievements) {
+                content += `
+                    <div class="mb-3">
+                        <span class="font-semibold text-accent">🎯 Thành tựu:</span>
+                        <p class="text-sm mt-1">${entry.achievements}</p>
+                    </div>`;
+            }
+            
+            if (entry.stress) {
+                content += `
+                    <div class="mb-3">
+                        <span class="font-semibold text-accent">⚠️ Căng thẳng:</span>
+                        <p class="text-sm mt-1">${entry.stress}</p>
+                    </div>`;
+            }
+            
+            if (entry.content) {
+                content += `
+                    <div class="mb-3">
+                        <span class="font-semibold text-accent">📝 Nội dung:</span>
+                        <p class="text-sm mt-1 line-clamp-3">${entry.content}</p>
+                    </div>`;
+            }
+            
+            if (hasGratitude) {
+                content += `
+                    <div class="mb-3">
+                        <span class="font-semibold text-accent">🙏 Biết ơn:</span>
+                        <ul class="text-sm mt-1 space-y-1">`;
+                
+                if (entry.gratitude1) content += `<li>• ${entry.gratitude1}</li>`;
+                if (entry.gratitude2) content += `<li>• ${entry.gratitude2}</li>`;
+                if (entry.gratitude3) content += `<li>• ${entry.gratitude3}</li>`;
+                
+                content += `</ul></div>`;
+            }
+            
+            if (hasSelfCare) {
+                content += `
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <span class="font-semibold text-accent">💆‍♀️ Self-care:</span>
+                        <div class="flex flex-wrap gap-1 mt-2">`;
+                
+                for (let i = 0; i < entry.selfCare.length; i++) {
+                    content += `<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">${entry.selfCare[i]}</span>`;
+                }
+                
+                content += `</div></div>`;
+            }
+            
+            if (hasPhotos) {
+                const photoCount = Math.min(entry.photos.length, 3);
+                content += `
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <span class="font-semibold text-accent">📸 Ảnh:</span>
+                        <div class="flex space-x-2 mt-2 overflow-x-auto">`;
+                
+                for (let i = 0; i < photoCount; i++) {
+                    content += `<img src="${entry.photos[i]}" alt="Photo" class="w-20 h-20 object-cover rounded-lg flex-shrink-0">`;
+                }
+                
+                content += `</div></div>`;
+            }
+            
+            const timeString = entry.timestamp ? 
+                new Date(entry.timestamp).toLocaleTimeString('vi-VN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }) : 'Không có thời gian';
+            
+            content += `
                     <div class="mt-4 pt-3 border-t border-gray-100 text-xs text-soft">
                         <i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>
-                        ${entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString('vi-VN', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        }) : 'Không có thời gian'}
+                        ${timeString}
                     </div>
-                </div>
-            `;
+                </div>`;
+            
+            item.innerHTML = content;
         } else {
             // Moment template
+            const timeString = entry.timestamp ? 
+                new Date(entry.timestamp).toLocaleTimeString('vi-VN', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                }) : 'Không có thời gian';
+            
+            const isHighlight = entry.type === 'highlight' ? ' • <span class="text-yellow-600">Từ highlight nhật ký</span>' : '';
+            
             item.innerHTML = `
                 <div class="bg-card p-6 rounded-card shadow-soft card-glow hover:transform hover:scale-[1.02] transition-all duration-300">
                     <div class="flex justify-between items-start mb-3">
@@ -270,11 +320,7 @@ export class TimelineManager {
                     
                     <div class="mt-4 pt-3 border-t border-gray-100 text-xs text-soft">
                         <i data-lucide="clock" class="w-3 h-3 inline mr-1"></i>
-                        ${entry.timestamp ? new Date(entry.timestamp).toLocaleTimeString('vi-VN', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        }) : 'Không có thời gian'}
-                        ${entry.type === 'highlight' ? ' • <span class="text-yellow-600">Từ highlight nhật ký</span>' : ''}
+                        ${timeString}${isHighlight}
                     </div>
                 </div>
             `;

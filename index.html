@@ -1,78 +1,164 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <!-- ========== SEO IMPROVEMENTS ========== -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pastel Daily Diary</title>
-
+    <title>Pastel Daily Diary - Nhật Ký Cảm Xúc & Tự Chăm Sóc</title>
+    <meta name="description" content="Ứng dụng nhật ký trực tuyến với giao diện pastel. Theo dõi tâm trạng hàng ngày, đặt mục tiêu self-care, lưu giữ khoảnh khắc đáng nhớ.">
+    
+    <!-- ========== PERFORMANCE OPTIMIZATIONS ========== -->
+    <!-- Tailwind CSS - Giữ nguyên CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
+    <!-- Fonts với preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- ========== TASK 4: TRACKING TOOLS ========== -->
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <!-- Sentry Error Monitoring -->
+    <script src="https://browser.sentry-cdn.com/7.75.0/bundle.min.js"></script>
+    <script>
+        Sentry.init({ 
+            dsn: "https://your-dsn@sentry.io/your-project-id",
+            environment: window.location.hostname === 'localhost' ? 'development' : 'production'
+        });
+    </script>
 </head>
-<body class="theme-mint min-h-screen pt-20" onresize="resizeChart()">
 
-    <!-- Theme Panel -->
-    <div id="theme-panel" class="fixed top-20 right-4 z-50 bg-card p-4 rounded-card shadow-soft hidden">
+<body class="theme-mint min-h-screen pt-20" onresize="resizeChart()">
+    <!-- ========== THEME PANEL ========== -->
+    <div id="theme-panel" class="fixed top-20 right-4 z-50 bg-card p-4 rounded-card shadow-soft hidden" 
+         role="dialog" 
+         aria-label="Chọn chủ đề giao diện">
         <h3 class="font-bold mb-3 text-lg">Chọn Chủ Đề</h3>
         <div class="grid grid-cols-2 gap-3">
-            <button onclick="setTheme('mint')" class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" style="background-color: #AEE6E6;">Mint Pastel</button>
-            <button onclick="setTheme('pink')" class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" style="background-color: #FFC0CB;">Pink Pastel</button>
-            <button onclick="setTheme('lavender')" class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" style="background-color: #D8BFD8;">Lavender Pastel</button>
-            <button onclick="setTheme('ocean')" class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" style="background-color: #ADD8E6;">Ocean Soft</button>
-            <button onclick="setTheme('night')" class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition col-span-2 text-white" style="background-color: #2D3748;">Night Pastel</button>
+            <button onclick="setTheme('mint')" 
+                    class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" 
+                    style="background-color: #AEE6E6;"
+                    aria-label="Chọn chủ đề Mint Pastel">
+                Mint Pastel
+            </button>
+            <button onclick="setTheme('pink')" 
+                    class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" 
+                    style="background-color: #FFC0CB;"
+                    aria-label="Chọn chủ đề Pink Pastel">
+                Pink Pastel
+            </button>
+            <button onclick="setTheme('lavender')" 
+                    class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" 
+                    style="background-color: #D8BFD8;"
+                    aria-label="Chọn chủ đề Lavender Pastel">
+                Lavender Pastel
+            </button>
+            <button onclick="setTheme('ocean')" 
+                    class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition" 
+                    style="background-color: #ADD8E6;"
+                    aria-label="Chọn chủ đề Ocean Soft">
+                Ocean Soft
+            </button>
+            <button onclick="setTheme('night')" 
+                    class="theme-btn p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition col-span-2 text-white" 
+                    style="background-color: #2D3748;"
+                    aria-label="Chọn chủ đề Night Pastel">
+                Night Pastel
+            </button>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-40 bg-card shadow-soft p-4">
+    <!-- ========== NAVIGATION ========== -->
+    <nav class="fixed top-0 left-0 right-0 z-40 bg-card shadow-soft p-4" 
+         role="navigation" 
+         aria-label="Điều hướng chính">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="text-2xl font-bold text-accent">
-                <i data-lucide="book-open" class="inline w-6 h-6 mr-2"></i>
+                <i data-lucide="book-open" class="inline w-6 h-6 mr-2" aria-hidden="true"></i>
                 Diary for you🌿
             </div>
             
             <div class="flex space-x-2 md:space-x-4">
-                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" data-view="diary" onclick="switchView('diary')">
-                    <i data-lucide="book-open" class="w-5 h-5"></i><span class="hidden md:inline"> Nhật Ký</span>
+                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        data-view="diary" 
+                        onclick="switchView('diary')"
+                        aria-label="Chuyển đến trang Nhật Ký">
+                    <i data-lucide="book-open" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Nhật Ký</span>
                 </button>
-                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" data-view="timeline" onclick="switchView('timeline')">
-                    <i data-lucide="clock" class="w-5 h-5"></i><span class="hidden md:inline"> Timeline</span>
+                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        data-view="timeline" 
+                        onclick="switchView('timeline')"
+                        aria-label="Chuyển đến trang Timeline">
+                    <i data-lucide="clock" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Timeline</span>
                 </button>
-                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" data-view="report" onclick="switchView('report')">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i><span class="hidden md:inline"> Báo Cáo</span>
+                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        data-view="report" 
+                        onclick="switchView('report')"
+                        aria-label="Chuyển đến trang Báo Cáo">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Báo Cáo</span>
                 </button>
-                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" data-view="reflection" onclick="switchView('reflection')">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i><span class="hidden md:inline"> Reflection</span>
+                <button class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        data-view="reflection" 
+                        onclick="switchView('reflection')"
+                        aria-label="Chuyển đến trang Reflection">
+                    <i data-lucide="sparkles" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Reflection</span>
                 </button>
-                <button id="theme-toggle" class="nav-item p-2 md:px-4 flex items-center space-x-1" onclick="toggleThemePanel()">
-                    <i data-lucide="palette" class="w-5 h-5"></i><span class="hidden md:inline"> Theme</span>
+                <button id="theme-toggle" 
+                        class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        onclick="toggleThemePanel()"
+                        aria-label="Mở bảng chọn chủ đề"
+                        aria-expanded="false"
+                        aria-controls="theme-panel">
+                    <i data-lucide="palette" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Theme</span>
                 </button>
-                <button id="export-btn" class="nav-item p-2 md:px-4 flex items-center space-x-1" onclick="exportData()">
-                    <i data-lucide="download" class="w-5 h-5"></i><span class="hidden md:inline"> Export</span>
+                <button id="export-btn" 
+                        class="nav-item p-2 md:px-4 flex items-center space-x-1" 
+                        onclick="exportData()"
+                        aria-label="Xuất dữ liệu nhật ký">
+                    <i data-lucide="download" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="hidden md:inline"> Export</span>
                 </button>
             </div>
         </div>
     </nav>
     
-    <!-- Main Content -->
-    <main class="max-w-5xl mx-auto p-4 md:p-8">
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="max-w-5xl mx-auto p-4 md:p-8" role="main">
         
         <!-- Header with Streak Counter -->
         <div class="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0">
-            <div id="streak-counter" class="bg-button text-white px-4 py-2 rounded-[18px] font-semibold text-sm shadow-soft animate-pulse">
+            <div id="streak-counter" 
+                 class="bg-button text-white px-4 py-2 rounded-[18px] font-semibold text-sm shadow-soft animate-pulse"
+                 aria-live="polite">
                 🔥 0 ngày liên tiếp
             </div>
-            <div class="bg-card shadow-soft rounded-[20px] p-4 text-center text-lg font-semibold card-glow" style="background: linear-gradient(135deg, var(--accent-light), #FFE0E6);">
-                <i data-lucide="heart" class="inline w-5 h-5 mr-2"></i>
+            <div class="bg-card shadow-soft rounded-[20px] p-4 text-center text-lg font-semibold card-glow" 
+                 style="background: linear-gradient(135deg, var(--accent-light), #FFE0E6);">
+                <i data-lucide="heart" class="inline w-5 h-5 mr-2" aria-hidden="true"></i>
                 You're enough 💗 Hôm nay bạn đã cố gắng rồi.
             </div>
         </div>
 
-        <!-- Diary Page -->
+        <!-- ========== DIARY PAGE ========== -->
         <div id="diary-page" class="view">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Note to Self</h1>
             
@@ -80,7 +166,7 @@
                 
                 <!-- Date Header -->
                 <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i data-lucide="calendar" class="w-6 h-6 mr-2"></i>
+                    <i data-lucide="calendar" class="w-6 h-6 mr-2" aria-hidden="true"></i>
                     Ngày: <span id="current-date">10/12/2025</span>
                 </h2>
 
@@ -88,11 +174,31 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold mb-3 text-soft">Tâm trạng hôm nay:</h3>
                     <div id="mood-selector" class="flex space-x-4">
-                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" data-mood="😊">😊</button>
-                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" data-mood="😢">😢</button>
-                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" data-mood="😡">😡</button>
-                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" data-mood="😴">😴</button>
-                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" data-mood="✨">✨</button>
+                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" 
+                                data-mood="😊"
+                                aria-label="Chọn tâm trạng vui vẻ">
+                            😊
+                        </button>
+                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" 
+                                data-mood="😢"
+                                aria-label="Chọn tâm trạng buồn bã">
+                            😢
+                        </button>
+                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" 
+                                data-mood="😡"
+                                aria-label="Chọn tâm trạng tức giận">
+                            😡
+                        </button>
+                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" 
+                                data-mood="😴"
+                                aria-label="Chọn tâm trạng mệt mỏi">
+                            😴
+                        </button>
+                        <button class="mood-btn text-4xl p-3 rounded-full bg-accent-light hover:scale-105 transition" 
+                                data-mood="✨"
+                                aria-label="Chọn tâm trạng tuyệt vời">
+                            ✨
+                        </button>
                     </div>
                 </div>
 
@@ -100,31 +206,51 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
-                            <i data-lucide="trophy" class="w-5 h-5 mr-2"></i>
+                            <i data-lucide="trophy" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                             Thành tựu hôm nay
                         </h3>
-                        <textarea id="achievements" rows="3" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" placeholder="  Gợi ý: Ăn đủ bữa, tập thể dục, skincare…"></textarea>
+                        <textarea id="achievements" 
+                                  rows="3" 
+                                  class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" 
+                                  placeholder="  Gợi ý: Ăn đủ bữa, tập thể dục, skincare…"
+                                  aria-label="Nhập thành tựu của bạn hôm nay"></textarea>
                     </div>
 
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
-                            <i data-lucide="alert-triangle" class="w-5 h-5 mr-2"></i>
+                            <i data-lucide="alert-triangle" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                             Điều làm mình căng thẳng
                         </h3>
-                        <input id="stress" type="text" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" placeholder="Chỉ 1-2 dòng thôi nhé.">
+                        <input id="stress" 
+                               type="text" 
+                               class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" 
+                               placeholder="Chỉ 1-2 dòng thôi nhé."
+                               aria-label="Nhập điều làm bạn căng thẳng hôm nay">
                     </div>
                 </div>
 
                 <!-- Gratitude Section -->
                 <div class="bg-accent-light p-6 rounded-card shadow-card mb-8 card-glow">
                     <h3 class="text-xl font-semibold mb-3 flex items-center">
-                        <i data-lucide="heart" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="heart" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         3 điều mình biết ơn hôm nay
                     </h3>
                     <div class="space-y-3">
-                        <input id="gratitude1" type="text" class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" placeholder="1. Điều biết ơn thứ nhất">
-                        <input id="gratitude2" type="text" class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" placeholder="2. Điều biết ơn thứ hai">
-                        <input id="gratitude3" type="text" class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" placeholder="3. Điều biết ơn thứ ba">
+                        <input id="gratitude1" 
+                               type="text" 
+                               class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" 
+                               placeholder="1. Điều biết ơn thứ nhất"
+                               aria-label="Điều biết ơn thứ nhất">
+                        <input id="gratitude2" 
+                               type="text" 
+                               class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" 
+                               placeholder="2. Điều biết ơn thứ hai"
+                               aria-label="Điều biết ơn thứ hai">
+                        <input id="gratitude3" 
+                               type="text" 
+                               class="w-full rounded-input bg-card border-accent focus:ring-button focus:border-button transition" 
+                               placeholder="3. Điều biết ơn thứ ba"
+                               aria-label="Điều biết ơn thứ ba">
                     </div>
                 </div>
 
@@ -132,38 +258,38 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
-                            <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+                            <i data-lucide="check-circle" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                             Self-care Checklist
                         </h3>
                         <div class="space-y-2">
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Uống nước đủ">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Uống nước đủ" aria-label="Uống nước đủ">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Uống nước đủ</span>
                             </label>
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Skincare">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Skincare" aria-label="Skincare">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Skincare</span>
                             </label>
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Nghỉ ngơi">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Nghỉ ngơi" aria-label="Nghỉ ngơi">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Nghỉ ngơi</span>
                             </label>
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Thiền">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Thiền" aria-label="Thiền">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Thiền</span>
                             </label>
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Tập thể dục">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Tập thể dục" aria-label="Tập thể dục">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Tập thể dục</span>
                             </label>
                             <label class="pastel-checkbox flex items-center space-x-3 cursor-pointer">
-                                <input type="checkbox" class="hidden" value="Dọn dẹp góc học tập">
-                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4"></i></span>
+                                <input type="checkbox" class="hidden" value="Dọn dẹp góc học tập" aria-label="Dọn dẹp góc học tập">
+                                <span class="checkbox-icon"><i data-lucide="check" class="w-4 h-4" aria-hidden="true"></i></span>
                                 <span>Dọn dẹp góc học tập</span>
                             </label>
                         </div>
@@ -171,24 +297,34 @@
                     
                     <div>
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
-                            <i data-lucide="star" class="w-5 h-5 mr-2"></i>
+                            <i data-lucide="star" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                             Khoảnh khắc đẹp nhất hôm nay
                         </h3>
-                        <input id="highlight" type="text" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition mb-6" placeholder="Một khoảnh khắc đáng nhớ">
+                        <input id="highlight" 
+                               type="text" 
+                               class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition mb-6" 
+                               placeholder="Một khoảnh khắc đáng nhớ"
+                               aria-label="Khoảnh khắc đẹp nhất hôm nay">
 
                         <h3 class="text-xl font-semibold mb-3 flex items-center">
-                            <i data-lucide="image" class="w-5 h-5 mr-2"></i>
+                            <i data-lucide="image" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                             Photo Journal (Tối đa 3 ảnh)
                         </h3>
                         <div class="flex space-x-2">
-                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload">
-                                <i data-lucide="plus" class="w-5 h-5 mr-1"></i> Ảnh 1
+                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload"
+                                 role="button"
+                                 aria-label="Tải lên ảnh 1">
+                                <i data-lucide="plus" class="w-5 h-5 mr-1" aria-hidden="true"></i> Ảnh 1
                             </div>
-                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload">
-                                <i data-lucide="plus" class="w-5 h-5 mr-1"></i> Ảnh 2
+                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload"
+                                 role="button"
+                                 aria-label="Tải lên ảnh 2">
+                                <i data-lucide="plus" class="w-5 h-5 mr-1" aria-hidden="true"></i> Ảnh 2
                             </div>
-                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload">
-                                <i data-lucide="plus" class="w-5 h-5 mr-1"></i> Ảnh 3
+                            <div class="w-1/3 h-20 rounded-[16px] bg-accent-light flex items-center justify-center text-soft text-sm cursor-pointer hover:bg-accent transition photo-upload"
+                                 role="button"
+                                 aria-label="Tải lên ảnh 3">
+                                <i data-lucide="plus" class="w-5 h-5 mr-1" aria-hidden="true"></i> Ảnh 3
                             </div>
                         </div>
                     </div>
@@ -197,27 +333,33 @@
                 <!-- Diary Content -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold mb-3 flex items-center">
-                        <i data-lucide="pen-tool" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="pen-tool" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Nội dung nhật ký
                     </h3>
-                    <textarea id="content" rows="10" class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" placeholder="Viết những suy nghĩ, cảm xúc, hoặc bất cứ điều gì bạn muốn lưu giữ."></textarea>
+                    <textarea id="content" 
+                              rows="10" 
+                              class="w-full rounded-input border-accent-light shadow-card focus:ring-button focus:border-button transition" 
+                              placeholder="Viết những suy nghĩ, cảm xúc, hoặc bất cứ điều gì bạn muốn lưu giữ."
+                              aria-label="Nội dung nhật ký"></textarea>
                     <p class="text-xs text-soft mt-1 text-right">
-                        <i data-lucide="clock" class="inline w-3 h-3 mr-1"></i>
+                        <i data-lucide="clock" class="inline w-3 h-3 mr-1" aria-hidden="true"></i>
                         <span id="save-status">Đã lưu tự động</span>
                     </p>
                 </div>
 
                 <!-- Save Button -->
-                <button onclick="saveDailyEntry()" class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse">
+                <button onclick="saveDailyEntry()" 
+                        class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse"
+                        aria-label="Lưu nhật ký hôm nay">
                     <span class="flex items-center justify-center space-x-2">
-                        <i data-lucide="save" class="w-5 h-5"></i>
+                        <i data-lucide="save" class="w-5 h-5" aria-hidden="true"></i>
                         <span>Lưu nhật ký hôm nay</span>
                     </span>
                 </button>
             </div>
         </div>
 
-        <!-- Timeline Page -->
+        <!-- ========== TIMELINE PAGE ========== -->
         <div id="timeline-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Dòng Thời Gian Kỷ Niệm</h1>
 
@@ -225,21 +367,21 @@
             <div class="bg-card p-4 md:p-6 rounded-card shadow-soft mb-8 flex flex-wrap gap-4 items-center card-glow">
                 <div class="flex-grow">
                     <div class="relative">
-                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
-                        <input id="search-input" type="text" placeholder="     Tìm kiếm từ khóa..." class="w-full pl-10 rounded-input border-accent-light shadow-sm">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true"></i>
+                        <input id="search-input" 
+                               type="text" 
+                               placeholder="     Tìm kiếm từ khóa..." 
+                               class="w-full pl-10 rounded-input border-accent-light shadow-sm"
+                               aria-label="Tìm kiếm trong nhật ký">
                     </div>
-                </div>
-                
-                <!-- Date Range (Optional) -->
-                <div class="hidden md:flex space-x-3">
-                    <input type="date" class="rounded-input border-accent-light shadow-sm">
-                    <span class="text-soft self-center">đến</span>
-                    <input type="date" class="rounded-input border-accent-light shadow-sm">
                 </div>
                 
                 <!-- Mood Filter -->
                 <div>
-                    <select id="mood-filter" onchange="filterTimelineEntries()" class="rounded-input border-accent-light shadow-sm">
+                    <select id="mood-filter" 
+                            onchange="filterTimelineEntries()" 
+                            class="rounded-input border-accent-light shadow-sm"
+                            aria-label="Lọc theo tâm trạng">
                         <option value="">Lọc tâm trạng...</option>
                         <option value="😊">😊 Vui vẻ</option>
                         <option value="😢">😢 Buồn bã</option>
@@ -249,27 +391,24 @@
                     </select>
                 </div>
                 
-                <!-- Type Filter (New) -->
+                <!-- Type Filter -->
                 <div>
-                    <select id="type-filter" onchange="filterTimelineEntries()" class="rounded-input border-accent-light shadow-sm">
+                    <select id="type-filter" 
+                            onchange="filterTimelineEntries()" 
+                            class="rounded-input border-accent-light shadow-sm"
+                            aria-label="Lọc theo loại nội dung">
                         <option value="">Tất cả loại</option>
                         <option value="entry">Nhật ký</option>
                         <option value="moment">Khoảnh khắc</option>
                     </select>
                 </div>
                 
-                <button onclick="clearFilters()" class="text-sm text-soft hover:text-accent transition">
-                    <i data-lucide="filter-x" class="w-4 h-4 mr-1"></i>
+                <button onclick="clearFilters()" 
+                        class="text-sm text-soft hover:text-accent transition"
+                        aria-label="Xóa tất cả bộ lọc">
+                    <i data-lucide="filter-x" class="w-4 h-4 mr-1" aria-hidden="true"></i>
                     Xóa bộ lọc
                 </button>
-            </div>
-
-            <!-- Loading Indicator -->
-            <div id="timeline-loading" class="hidden">
-                <div class="flex items-center justify-center p-8">
-                    <div class="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-                    <span class="ml-3">Đang tải dữ liệu...</span>
-                </div>
             </div>
 
             <!-- Timeline Container -->
@@ -277,55 +416,39 @@
                 
                 <!-- Add Moment Button -->
                 <div class="timeline-item flex justify-center">
-                    <button class="bg-button text-white p-3 rounded-[24px] text-sm font-semibold shadow-soft hover:opacity-90 transition flex items-center space-x-2 btn-pulse" onclick="showMomentInput()">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
+                    <button class="bg-button text-white p-3 rounded-[24px] text-sm font-semibold shadow-soft hover:opacity-90 transition flex items-center space-x-2 btn-pulse" 
+                            onclick="showMomentInput()"
+                            aria-label="Thêm khoảnh khắc đáng nhớ">
+                        <i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i>
                         <span>Thêm khoảnh khắc đáng nhớ</span>
                     </button>
                 </div>
                 
-                <!-- Moment Input Form -->
-                <div id="moment-input" class="bg-card p-6 rounded-card shadow-soft mb-8 hidden card-glow">
-                    <h3 class="text-xl font-semibold mb-3 text-accent">Thêm Khoảnh Khắc</h3>
-                    <input id="moment-name" type="text" class="w-full rounded-input border-accent-light shadow-sm mb-3" placeholder="Tên khoảnh khắc (VD: Ăn tối cùng bạn bè)">
-                    <textarea id="moment-desc" rows="2" class="w-full rounded-input border-accent-light shadow-sm mb-3" placeholder="Mô tả ngắn gọn..."></textarea>
-                    <div class="flex space-x-2">
-                        <button onclick="saveMoment()" class="bg-accent text-white p-3 rounded-lg font-semibold hover:bg-button transition flex items-center space-x-2">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Lưu Khoảnh Khắc</span>
-                        </button>
-                        <button class="text-soft p-3 rounded-lg hover:bg-gray-100 transition" onclick="document.getElementById('moment-input').classList.add('hidden')">
-                            <i data-lucide="x" class="w-4 h-4 mr-1"></i>
-                            Hủy
-                        </button>
-                    </div>
-                </div>
-                
                 <!-- Timeline items will be dynamically loaded here -->
-                
+                <div id="timeline-items-container" aria-live="polite"></div>
             </div>
         </div>
         
-        <!-- Report Page -->
+        <!-- ========== REPORT PAGE ========== -->
         <div id="report-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Báo Cáo Tâm Trạng</h1>
 
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
-                    <i data-lucide="award" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
+                    <i data-lucide="award" class="w-8 h-8 mx-auto mb-3 text-accent" aria-hidden="true"></i>
                     <p class="text-sm text-soft mb-2">Ngày tích cực nhất</p>
                     <p id="most-positive-mood" class="text-4xl">✨</p>
                     <p id="most-positive-day" class="text-xl font-bold text-accent">--/--/----</p>
                 </div>
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
-                    <i data-lucide="trending-up" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
+                    <i data-lucide="trending-up" class="w-8 h-8 mx-auto mb-3 text-accent" aria-hidden="true"></i>
                     <p class="text-sm text-soft mb-2">Tần suất cao nhất</p>
                     <p id="most-frequent-mood" class="text-4xl">😊</p>
                     <p id="mood-percentage" class="text-xl font-bold text-accent">0%</p>
                 </div>
                 <div class="bg-card p-6 rounded-card shadow-soft text-center card-glow">
-                    <!-- Sửa icon stress từ alert-circle thành frown hoặc angry -->
-                    <i data-lucide="frown" class="w-8 h-8 mx-auto mb-3 text-accent"></i>
+                    <i data-lucide="frown" class="w-8 h-8 mx-auto mb-3 text-accent" aria-hidden="true"></i>
                     <p class="text-sm text-soft mb-2">Ngày buồn/giận nhất</p>
                     <p id="most-stressful-mood" class="text-4xl">😡</p>
                     <p id="stressful-day" class="text-xl font-bold text-accent">--/--/----</p>
@@ -336,56 +459,38 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-card p-6 rounded-card shadow-soft card-glow">
                     <h2 class="text-xl font-semibold mb-4 flex items-center">
-                        <i data-lucide="bar-chart" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="bar-chart" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Biểu đồ Tâm trạng Tuần
                     </h2>
-                    <div id="weekly-chart" class="w-full h-64"></div>
+                    <div id="weekly-chart" 
+                         class="w-full h-64"
+                         role="img" 
+                         aria-label="Biểu đồ tâm trạng tuần"></div>
                 </div>
                 <div class="bg-card p-6 rounded-card shadow-soft card-glow">
                     <h2 class="text-xl font-semibold mb-4 flex items-center">
-                        <i data-lucide="pie-chart" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="pie-chart" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Tần suất Tâm trạng Tháng
                     </h2>
-                    <div id="pie-chart" class="w-full h-64 flex justify-center items-center"></div>
-                </div>
-            </div>
-
-            <!-- Monthly Stats -->
-            <div class="mt-8 bg-card p-6 rounded-card shadow-soft card-glow">
-                <h2 class="text-xl font-semibold mb-4 flex items-center">
-                    <i data-lucide="calendar" class="w-5 h-5 mr-2"></i>
-                    Thống kê tháng
-                </h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-4 bg-accent-light rounded-lg">
-                        <p class="text-sm text-soft">Số ngày viết</p>
-                        <p id="days-written" class="text-2xl font-bold text-accent">0</p>
-                    </div>
-                    <div class="text-center p-4 bg-accent-light rounded-lg">
-                        <p class="text-sm text-soft">Tỉ lệ tích cực</p>
-                        <p id="positive-rate" class="text-2xl font-bold text-accent">0%</p>
-                    </div>
-                    <div class="text-center p-4 bg-accent-light rounded-lg">
-                        <p class="text-sm text-soft">Checklist hoàn thành</p>
-                        <p id="checklist-completed" class="text-2xl font-bold text-accent">0%</p>
-                    </div>
-                    <div class="text-center p-4 bg-accent-light rounded-lg">
-                        <p class="text-sm text-soft">Thời gian trung bình</p>
-                        <p id="avg-time" class="text-2xl font-bold text-accent">0 phút</p>
-                    </div>
+                    <div id="pie-chart" 
+                         class="w-full h-64 flex justify-center items-center"
+                         role="img" 
+                         aria-label="Biểu đồ tần suất tâm trạng tháng"></div>
                 </div>
             </div>
             
             <!-- Refresh Button -->
             <div class="mt-6 text-center">
-                <button onclick="refreshReport()" class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-button transition flex items-center space-x-2 mx-auto">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <button onclick="refreshReport()" 
+                        class="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-button transition flex items-center space-x-2 mx-auto"
+                        aria-label="Làm mới báo cáo">
+                    <i data-lucide="refresh-cw" class="w-4 h-4" aria-hidden="true"></i>
                     <span>Làm mới báo cáo</span>
                 </button>
             </div>
         </div>
 
-        <!-- Reflection Page -->
+        <!-- ========== REFLECTION PAGE ========== -->
         <div id="reflection-page" class="view hidden">
             <h1 class="text-3xl font-bold mb-6 text-center text-accent">Reflection Tháng 12</h1>
 
@@ -394,50 +499,62 @@
                 <!-- What I Learned -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
-                        <i data-lucide="lightbulb" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="lightbulb" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Bạn học được gì tháng này?
                     </h3>
-                    <textarea id="learned" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Viết những bài học quan trọng bạn đã rút ra."></textarea>
+                    <textarea id="learned" 
+                              rows="4" 
+                              class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" 
+                              placeholder="Viết những bài học quan trọng bạn đã rút ra."
+                              aria-label="Nhập điều bạn học được tháng này"></textarea>
                 </div>
 
                 <!-- What I'm Proud Of -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
-                        <i data-lucide="trophy" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="trophy" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Điều bạn tự hào nhất?
                     </h3>
-                    <textarea id="proud-of" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Chia sẻ về những thành tựu đã đạt được."></textarea>
+                    <textarea id="proud-of" 
+                              rows="4" 
+                              class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" 
+                              placeholder="Chia sẻ về những thành tựu đã đạt được."
+                              aria-label="Nhập điều bạn tự hào tháng này"></textarea>
                 </div>
 
                 <!-- What to Improve -->
                 <div class="p-6 rounded-xl border border-accent-light bg-accent-light/5 card-glow">
                     <h3 class="text-xl font-semibold mb-3 text-accent flex items-center">
-                        <i data-lucide="target" class="w-5 h-5 mr-2"></i>
+                        <i data-lucide="target" class="w-5 h-5 mr-2" aria-hidden="true"></i>
                         Điều muốn cải thiện?
                     </h3>
-                    <textarea id="improvement" rows="4" class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" placeholder="Mục tiêu cho tháng sau hoặc những điểm cần thay đổi."></textarea>
+                    <textarea id="improvement" 
+                              rows="4" 
+                              class="w-full rounded-input border-accent-light shadow-sm focus:ring-button focus:border-button transition" 
+                              placeholder="Mục tiêu cho tháng sau hoặc những điểm cần thay đổi."
+                              aria-label="Nhập điều bạn muốn cải thiện"></textarea>
                 </div>
                 
                 <!-- Save Button -->
-                <button onclick="saveReflection()" class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse">
+                <button onclick="saveReflection()" 
+                        class="bg-button text-white w-full p-4 rounded-[24px] text-xl font-semibold shadow-soft hover:opacity-90 transition btn-pulse"
+                        aria-label="Lưu reflection">
                     <span class="flex items-center justify-center space-x-2">
-                        <i data-lucide="save" class="w-5 h-5"></i>
+                        <i data-lucide="save" class="w-5 h-5" aria-hidden="true"></i>
                         <span>Lưu Reflection</span>
                     </span>
                 </button>
             </div>
         </div>
-
     </main>
 
     <!-- Notification Container -->
-    <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div id="notification-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="assertive"></div>
 
     <!-- Scripts -->
-     <script type="module">
+    <script type="module">
         import { initializeApp } from './app.js';
         
-        // Khởi tạo app khi DOM sẵn sàng
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
